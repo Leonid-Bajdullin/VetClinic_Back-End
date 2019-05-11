@@ -24,4 +24,31 @@ var doctorSchema = new Schema({
 }, {
     collection: 'doctors'
 });
-const Doctor = mongoose.model('Doctor', doctorSchema)
+const Doctor = mongoose.model('Doctor', doctorSchema);
+
+var roomSchema = new Schema({
+    roomID: Number,
+    doctor: Number
+}, {
+    collection: 'rooms'
+});
+const Room = mongoose.model('Room', roomSchema);
+
+var serviceSchema = new Schema({
+    serviceID: Number,
+    name: String,
+    doctor: Number
+}, {
+    collection: 'services'
+});
+const Service = mongoose.model('Service', serviceSchema);
+
+var orderSchema = new Schema({
+    OrderID: Number,
+    user: Number,
+    doctor: Number,
+    service: Number
+}, {
+    collection: 'orders'
+});
+const Order = mongoose.model('Order', orderSchema);
