@@ -1,54 +1,106 @@
+// Connecting express server, graphql, cors
+const express = require('express');
+const app = express();
+const port = 4000;
+
+const cors = require('cors');
+app.use(cors());
+
+const express_graphql = require('express-graphql');
+const {buildSchema} = require('graphql');
+
+// Defining GraphQL schema + creating endpoint 
+
+// const schema = buildSchema(`
+// type Query {
+//     getOrder(id: ID!): Order
+//     getUser(id: ID!): User
+// }
+// type User {
+//     id: ID,
+//     name: String,
+//     lastName: String,
+//     orders: [Order]
+// }
+// type Order {
+//     id: ID,
+//     user: User
+// }`);
+// app.use('/graphql', express_graphql({
+//     schema: schema,
+//     rootValue: root,
+//     graphiql: true
+// }));
+
+// const resolvers = {
+//     Query: {
+//         getOrder: async (root, {id}) => {
+//             return await Order.findById(id)
+//         },
+//         getUser: async (root, {id}) => {
+//             return await User.findById(id)
+//         }
+//     }
+// }
+
+// var root = {
+//     resolvers
+// };
+
 // Connecting MongoDB
+// import {MongoClient, ObjectId} from 'mongodb'
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/VetClinic');
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
+// ======================================================================
 // Defining mongoose Schemas
-var Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
-
-var userSchema = new Schema({
-    userID: Number,
+const userSchema = Schema({
+    id: Schema.Types.ObjectId,
     name: String,
-    lastName: String
+    lastName: String,
+    type: String,
+    orders: [{type: Schema.Types.ObjectId, ref: 'Order'}]
 }, {
     collection: 'users'
 });
 const User = mongoose.model('User', userSchema);
 
-var doctorSchema = new Schema({
-    doctorID: Number,
-    name: String,
-    lastName: String
+const orderSchema = Schema({
+    id: Schema.Types.ObjectId,
+    user: {type: Schema.Types.ObjectId, ref: 'User'}
 }, {
-    collection: 'doctors'
+    collection: 'orders'
 });
-const Doctor = mongoose.model('Doctor', doctorSchema);
+const Order = mongoose.model('Order', orderSchema);
 
-var roomSchema = new Schema({
-    roomID: Number,
-    doctor: Number
-}, {
-    collection: 'rooms'
-});
-const Room = mongoose.model('Room', roomSchema);
+const orders = [{}, {}]
+app.get('/orderslist', (req, res) => res.send(orders))
+app.post('/orders', (req, res) => {
+    var myData = new Order({user: req.body.user});
+    myData.save()
+        .then(item => {
+            res.status(201).send(req.body);
+        })
+        .catch(err => {
+            res.status(400).send({nick: undefined, message: "no message sent" });
+        });
+}); 
 
 var serviceSchema = new Schema({
-    serviceID: Number,
+    id: Schema.Types.ObjectId,
     name: String,
-    doctor: Number
+    order: {type: Schema.Types.ObjectId, ref: 'Order'},
+    duration: Number,
+    price: Number
 }, {
     collection: 'services'
 });
 const Service = mongoose.model('Service', serviceSchema);
 
-var orderSchema = new Schema({
-    OrderID: Number,
-    user: Number,
-    doctor: Number,
-    service: Number
-}, {
-    collection: 'orders'
-});
-const Order = mongoose.model('Order', orderSchema);
+
+
+app.listen(port, () => console.log(`Example app listening on port ${port}!`))
