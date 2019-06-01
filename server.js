@@ -1,10 +1,14 @@
-// Connecting express server, graphql, cors
+// Connecting express server, graphql, cors, body-parser
 const express = require('express');
 const app = express();
 const port = 4000;
 
 const cors = require('cors');
 app.use(cors());
+
+const bodyParser = require('body-parser')
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}))
 
 const express_graphql = require('express-graphql');
 const {buildSchema} = require('graphql');
@@ -71,24 +75,12 @@ const User = mongoose.model('User', userSchema);
 
 const orderSchema = Schema({
     id: Schema.Types.ObjectId,
-    user: {type: Schema.Types.ObjectId, ref: 'User'}
+    user: {type: Schema.Types.ObjectId, ref: 'User'},
+    services: [{type: Schema.Types.ObjectId, ref: 'Service'}]
 }, {
     collection: 'orders'
 });
 const Order = mongoose.model('Order', orderSchema);
-
-const orders = [{}, {}]
-app.get('/orderslist', (req, res) => res.send(orders))
-app.post('/orders', (req, res) => {
-    var myData = new Order({user: req.body.user});
-    myData.save()
-        .then(item => {
-            res.status(201).send(req.body);
-        })
-        .catch(err => {
-            res.status(400).send({nick: undefined, message: "no message sent" });
-        });
-}); 
 
 var serviceSchema = new Schema({
     id: Schema.Types.ObjectId,
@@ -100,6 +92,49 @@ var serviceSchema = new Schema({
     collection: 'services'
 });
 const Service = mongoose.model('Service', serviceSchema);
+
+
+
+const orders = [{}, {}]
+
+app.get("/orderlist", async (request, response) => {
+    try {
+        var result = await Order.find().exec();
+        response.send(result);
+    } catch (error) {
+        response.status(500).send(error);
+    }
+});
+
+app.post("/orders", async (request, response) => {
+    try {
+        var order = new Order(request.body);
+        var result = await order.save();
+        response.send(result);
+    } catch (error) {
+        response.status(500).send(error);
+    }
+});
+app.post("/users", async (request, response) => {
+    try {
+        var user = new User(request.body);
+        var result = await user.save();
+        response.send(result);
+    } catch (error) {
+        response.status(500).send(error);
+    }
+});
+
+// app.post('/orders', (req, res) => {
+//     var myData = new Order({user: req.body.user});
+//     myData.save()
+//         .then(item => {
+//             res.status(201).send(req.body);
+//         })
+//         .catch(err => {
+//             res.status(400).send({nick: undefined, message: "no message sent" });
+//         });
+// }); 
 
 
 
