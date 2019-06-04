@@ -1,4 +1,4 @@
-// Connecting express server, graphql, cors, body-parser
+// Connecting express server, cors, body-parser
 const express = require('express');
 const app = express();
 const port = 4000;
@@ -8,48 +8,7 @@ app.use(cors());
 
 const bodyParser = require('body-parser')
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true}))
-
-const express_graphql = require('express-graphql');
-const {buildSchema} = require('graphql');
-
-// Defining GraphQL schema + creating endpoint 
-
-// const schema = buildSchema(`
-// type Query {
-//     getOrder(id: ID!): Order
-//     getUser(id: ID!): User
-// }
-// type User {
-//     id: ID,
-//     name: String,
-//     lastName: String,
-//     orders: [Order]
-// }
-// type Order {
-//     id: ID,
-//     user: User
-// }`);
-// app.use('/graphql', express_graphql({
-//     schema: schema,
-//     rootValue: root,
-//     graphiql: true
-// }));
-
-// const resolvers = {
-//     Query: {
-//         getOrder: async (root, {id}) => {
-//             return await Order.findById(id)
-//         },
-//         getUser: async (root, {id}) => {
-//             return await User.findById(id)
-//         }
-//     }
-// }
-
-// var root = {
-//     resolvers
-// };
+// app.use(bodyParser.urlencoded({extended: true}))
 
 // Connecting MongoDB
 // import {MongoClient, ObjectId} from 'mongodb'
@@ -58,8 +17,11 @@ mongoose.connect('mongodb://localhost:27017/VetClinic');
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
+// Importing mongoose Schemas
+
 // ======================================================================
 // Defining mongoose Schemas
+// const Schema = mongoose.Schema;
 const Schema = mongoose.Schema;
 
 const userSchema = Schema({
@@ -67,7 +29,7 @@ const userSchema = Schema({
     name: String,
     lastName: String,
     type: String,
-    orders: [{type: Schema.Types.ObjectId, ref: 'Order'}]
+    orders: [Object]
 }, {
     collection: 'users'
 });
@@ -76,7 +38,7 @@ const User = mongoose.model('User', userSchema);
 const orderSchema = Schema({
     id: Schema.Types.ObjectId,
     user: {type: Schema.Types.ObjectId, ref: 'User'},
-    services: [{type: Schema.Types.ObjectId, ref: 'Service'}]
+    services: [Object]
 }, {
     collection: 'orders'
 });
@@ -93,10 +55,8 @@ var serviceSchema = new Schema({
 });
 const Service = mongoose.model('Service', serviceSchema);
 
-
-
-const orders = [{}, {}]
-
+// =======================REST Endpoints===============================
+// -------------------GET--------------
 app.get("/orderlist", async (request, response) => {
     try {
         var result = await Order.find().exec();
@@ -106,9 +66,18 @@ app.get("/orderlist", async (request, response) => {
     }
 });
 
+app.get("/userlist", async (request, response) => {
+    try {
+        var result = await User.find().exec();
+        response.send(result);
+    } catch (error) {
+        response.status(500).send(error);
+    }
+});
+// ------------------POST-----------------
 app.post("/orders", async (request, response) => {
     try {
-        var order = new Order(request.body);
+        var order = new Order({user: request.body.user});
         var result = await order.save();
         response.send(result);
     } catch (error) {
@@ -117,24 +86,13 @@ app.post("/orders", async (request, response) => {
 });
 app.post("/users", async (request, response) => {
     try {
-        var user = new User(request.body);
+        var user = new User({name: request.body.name, lastName: request.body.lastName});
         var result = await user.save();
         response.send(result);
     } catch (error) {
         response.status(500).send(error);
     }
 });
-
-// app.post('/orders', (req, res) => {
-//     var myData = new Order({user: req.body.user});
-//     myData.save()
-//         .then(item => {
-//             res.status(201).send(req.body);
-//         })
-//         .catch(err => {
-//             res.status(400).send({nick: undefined, message: "no message sent" });
-//         });
-// }); 
 
 
 
