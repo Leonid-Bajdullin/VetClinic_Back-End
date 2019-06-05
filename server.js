@@ -28,6 +28,8 @@ const userSchema = Schema({
     id: Schema.Types.ObjectId,
     name: String,
     lastName: String,
+    email: String,
+    phoneNumber: String,
     type: String,
     orders: [Object]
 }, {
@@ -86,7 +88,14 @@ app.post("/orders", async (request, response) => {
 });
 app.post("/users", async (request, response) => {
     try {
-        var user = new User({name: request.body.name, lastName: request.body.lastName});
+        var user = new User(
+            {
+                name: request.body.name,
+                lastName: request.body.lastName,
+                email: request.body.email,
+                phoneNumber: request.body.phone
+            }
+        );
         var result = await user.save();
         response.send(result);
     } catch (error) {
