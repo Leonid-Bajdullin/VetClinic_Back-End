@@ -30,7 +30,8 @@ router.post("/signup", (req, res, next) => {
               password: hash,
               name: req.body.name,
               lastName: req.body.lastName,
-              phoneNumber: req.body.phone
+              phoneNumber: req.body.phone,
+              role: 'guest'
             });
             user.save()
               .then(result => {

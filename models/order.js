@@ -3,8 +3,11 @@ const Schema = mongoose.Schema;
 
 const orderSchema = Schema({
     _id: Schema.Types.ObjectId,
-    user: {type: Schema.Types.ObjectId, ref: 'User'},
-    services: [Object]
+    user: Schema.Types.ObjectId,
+    worker: Schema.Types.ObjectId,
+    service: String,
+    price: Number,
+    startTime: Object
 }, {
     collection: 'orders'
 });

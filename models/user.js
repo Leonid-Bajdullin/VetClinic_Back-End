@@ -8,7 +8,7 @@ const userSchema = Schema({
     email: {type: String, required: true, unique: true},
     phoneNumber: String,
     password: {type: String, required: true},
-    type: String,
+    role: String,
     orders: [Object]
 }, {
     collection: 'users'

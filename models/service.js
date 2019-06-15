@@ -3,8 +3,8 @@ const Schema = mongoose.Schema;
 
 var serviceSchema = new Schema({
     _id: Schema.Types.ObjectId,
+    user: Schema.Types.ObjectId,
     name: String,
-    order: {type: Schema.Types.ObjectId, ref: 'Order'},
     duration: Number,
     price: Number
 }, {
