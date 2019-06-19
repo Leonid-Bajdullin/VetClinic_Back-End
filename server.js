@@ -17,7 +17,7 @@ const jwt = require('jsonwebtoken');
 
 // Connecting MongoDB
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/VetClinic');
+mongoose.connect('mongodb://localhost:27017/vetclinic');
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
