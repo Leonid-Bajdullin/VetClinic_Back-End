@@ -22,11 +22,11 @@ router.post("/save_order", checkAuth, async (req, res) => {
   try {
     var order = new Order({
       _id: new mongoose.Types.ObjectId(),
-      user: req.body.user,
+      user: req.body.userId,
       service: req.body.service_name,
       price: req.body.price,
       worker: req.body.worker,
-      startTime: req.body.startTime
+      start_time: req.body.start_time,
     });
     await order.save();
     res.send({

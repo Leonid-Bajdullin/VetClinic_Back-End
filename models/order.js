@@ -7,7 +7,7 @@ const orderSchema = Schema({
     worker: Schema.Types.ObjectId,
     service: String,
     price: Number,
-    startTime: Number
+    start_time: String,
 }, {
     collection: 'orders'
 });

@@ -4,13 +4,12 @@ const config = 'secret';
 
 module.exports = (req, res, next) => {
     try {
-        const token = req.headers.authorization.split(" ")[1];
-        const decoded = jwt.verify(token, config);
-        req.userData = decoded;
+        const token = req.body.token;
+        jwt.verify(token, config);
         next();
     } catch (error) {
         return res.status(401).json({
-            message: 'Auth failed'
+            message: error.message
         });
     }
 };
